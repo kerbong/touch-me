@@ -115,7 +115,6 @@ function clearCircle(x, y, radius) {
 }
 
 function handleTouchStart(event) {
-  event.preventDefault();
   messageDiv.style.display = "none";
   for (let touch of event.changedTouches) {
     const color = getNextColor();
@@ -145,7 +144,6 @@ function handleTouchMove(event) {
 }
 
 function handleTouchEnd(event) {
-  event.preventDefault();
   for (let touch of event.changedTouches) {
     const touchData = activeTouches[touch.identifier];
     if (touchData) {
