@@ -19,7 +19,7 @@ let numberOfWinners = 1;
 let users = [];
 let activeTouches = {};
 let touchPickGo = false;
-const touchRadius = 1.8 * window.devicePixelRatio * 16; // 1.8cm in pixels
+const touchRadius = 1 * window.devicePixelRatio * 16; // 1.8cm in pixels
 const colors = [
   "red",
   "green",
@@ -136,6 +136,7 @@ function handleTouchStart(event) {
       drawCircle(user.x, user.y, touchRadius, user.color, true);
     });
   }
+  updatePulse(); // 추가
 }
 
 function handleTouchMove(event) {
@@ -157,12 +158,19 @@ function handleTouchEnd(event) {
           true
         );
       } else {
+        clearTimeout(touchData.pulseTimeout); // 파동 그리기
         // clearCircle(touchData.x, touchData.y, touchRadius);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         users.forEach((user) => {
           drawCircle(user.x, user.y, touchRadius, user.color, true);
         });
       }
+      setTimeout(() => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        users.forEach((user) => {
+          drawCircle(user.x, user.y, touchRadius, user.color, true);
+        });
+      }, 500);
       delete activeTouches[touch.identifier];
     }
   }
@@ -215,6 +223,29 @@ function pickWinners() {
     });
     statusDiv.textContent = "";
     startConfetti();
+    confettiParticles = [];
+    confettiActive = true;
+    for (let i = 0; i < 300; i++) {
+      confettiParticles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        width: Math.random() * 10 + 5,
+        height: Math.random() * 20 + 10,
+        speed: Math.random() * 3 + 2,
+        angle: Math.random() * 360,
+      });
+    }
+    setTimeout(() => {
+      confettiActive = false;
+      resetButton.style.display = "block";
+    }, 5000);
+
+    canvas.removeEventListener("touchstart", handleTouchStart);
+    canvas.removeEventListener("touchmove", handleTouchMove);
+    canvas.removeEventListener("touchend", handleTouchEnd);
+
+    requestAnimationFrame(updateConfetti);
   }
 }
 
@@ -263,27 +294,46 @@ function updateConfetti() {
     requestAnimationFrame(updateConfetti);
   }
 }
-
 function updatePulse() {
   const currentTime = Date.now();
   for (let id in activeTouches) {
     const touchData = activeTouches[id];
     const duration = currentTime - touchData.startTime;
     if (duration < 3000) {
-      const pulseProgress = duration / 3000;
-      const currentPulseRadius = touchRadius * (1 - pulseProgress);
+      const pulseProgress = duration / 5000;
+      const maxPulseRadius = touchRadius * 2; // 최대 반지름 설정
+      const currentPulseRadius = maxPulseRadius * (1 - pulseProgress); // 반지름 감소
+      const alpha = pulseProgress * 0.2; // 투명도 설정 (반대로 변경)
+
       clearCircle(touchData.x, touchData.y, touchRadius);
       drawCircle(touchData.x, touchData.y, touchRadius, touchData.color);
-      ctx.beginPath();
-      ctx.arc(touchData.x, touchData.y, currentPulseRadius, 0, Math.PI * 2);
-      ctx.strokeStyle = touchData.color;
-      ctx.stroke();
+
+      touchData.pulseTimeout = setTimeout(() => {
+        ctx.globalAlpha = alpha; // 투명도 적용
+        drawPulse(
+          touchData.x,
+          touchData.y,
+          currentPulseRadius,
+          touchData.color,
+          alpha
+        ); // 투명도 전달
+        ctx.globalAlpha = 1; // 투명도 초기화
+      }, 500); // 0.5초 후에 한 번만 그림
     } else {
       clearCircle(touchData.x, touchData.y, touchRadius);
       drawCircle(touchData.x, touchData.y, touchRadius, touchData.color, true);
     }
   }
   requestAnimationFrame(updatePulse);
+}
+
+function drawPulse(x, y, radius, color, alpha) {
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = alpha; // 투명도 적용
+  ctx.stroke();
+  ctx.globalAlpha = 1; // 투명도 초기화
 }
 
 updatePulse();
