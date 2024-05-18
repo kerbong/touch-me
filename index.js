@@ -115,6 +115,7 @@ function clearCircle(x, y, radius) {
 }
 
 function handleTouchStart(event) {
+  event.preventDefault();
   messageDiv.style.display = "none";
   for (let touch of event.changedTouches) {
     const color = getNextColor();
@@ -144,6 +145,7 @@ function handleTouchMove(event) {
 }
 
 function handleTouchEnd(event) {
+  event.preventDefault();
   for (let touch of event.changedTouches) {
     const touchData = activeTouches[touch.identifier];
     if (touchData) {
@@ -300,7 +302,7 @@ function updatePulse() {
     const touchData = activeTouches[id];
     const duration = currentTime - touchData.startTime;
     if (duration < 3000) {
-      const pulseProgress = duration / 5000;
+      const pulseProgress = duration / 6000;
       const maxPulseRadius = touchRadius * 2; // 최대 반지름 설정
       const currentPulseRadius = maxPulseRadius * (1 - pulseProgress); // 반지름 감소
       const alpha = pulseProgress * 0.2; // 투명도 설정 (반대로 변경)
