@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>터치미 | by 첵스쿨</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="controls">
+      <div>
+        <label for="numberOfWinners">뽑을 사람 :</label>
+
+        <input type="number" id="numberOfWinners" min="1" max="20" value="1" />
+        명
+      </div>
+
+      <button id="startButton">Start</button>
+    </div>
+    <div id="status"></div>
+    <div id="message" style="display: none">
+      시작!<br />3초 동안 터치해서<br />
+      참가해주세요
+    </div>
+    <button id="resetButton" style="display: none">Replay</button>
+    <canvas id="canvas"></canvas>
+    <canvas id="confetti-canvas"></canvas>
+    <script src="index.js"></script>
+  </body>
+</html>
