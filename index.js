@@ -95,7 +95,7 @@ function getNextColor() {
   return color;
 }
 
-function drawCircle(x, y, radius, color, border = false, borderWidth = 8) {
+function drawCircle(x, y, radius, color, border = false, borderWidth = 4) {
   ctx.save();
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, Math.PI * 2);
